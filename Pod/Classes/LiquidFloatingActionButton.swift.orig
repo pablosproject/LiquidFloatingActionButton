@@ -40,7 +40,7 @@ open class LiquidFloatingActionButton : UIView {
             baseView.animateStyle = animateStyle
         }
     }
-    open var enableShadow = false {
+    open var enableShadow = true {
         didSet {
             setNeedsDisplay()
         }
@@ -152,7 +152,7 @@ open class LiquidFloatingActionButton : UIView {
         
         // draw plus shape
         let plusLayer = CAShapeLayer()
-		plusLayer.lineCap = CAShapeLayerLineCap.round
+        plusLayer.lineCap = kCALineCapRound
         plusLayer.strokeColor = UIColor.white.cgColor
         plusLayer.lineWidth = 3.0
         
@@ -263,9 +263,9 @@ class ActionBarBaseView : UIView {
     func translateY(_ layer: CALayer, duration: CFTimeInterval, f: (CABasicAnimation) -> ()) {
         let translate = CABasicAnimation(keyPath: "transform.translation.y")
         f(translate)
-		translate.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+        translate.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         translate.isRemovedOnCompletion = false
-		translate.fillMode = CAMediaTimingFillMode.forwards
+        translate.fillMode = kCAFillModeForwards
         translate.duration = duration
         layer.add(translate, forKey: "transYAnim")
     }
@@ -273,9 +273,9 @@ class ActionBarBaseView : UIView {
 
 class CircleLiquidBaseView : ActionBarBaseView {
 
-    let openDuration: CGFloat  = 0.2
-    let closeDuration: CGFloat = 0.15
-    let viscosity: CGFloat     = 0.50
+    let openDuration: CGFloat  = 0.6
+    let closeDuration: CGFloat = 0.2
+    let viscosity: CGFloat     = 0.65
     var animateStyle: LiquidFloatingActionButtonAnimateStyle = .up
     var color: UIColor = UIColor(red: 82 / 255.0, green: 112 / 255.0, blue: 235 / 255.0, alpha: 1.0) {
         didSet {
@@ -287,10 +287,7 @@ class CircleLiquidBaseView : ActionBarBaseView {
     var baseLiquid: LiquittableCircle?
     var engine:     SimpleCircleLiquidEngine?
     var bigEngine:  SimpleCircleLiquidEngine?
-	var enableShadow = false {
-		didSet {
-		}
-	}
+    var enableShadow = true
 
     fileprivate var openingCells: [LiquidFloatingCell] = []
     fileprivate var keyDuration: CGFloat = 0
@@ -303,8 +300,8 @@ class CircleLiquidBaseView : ActionBarBaseView {
         let radius = min(self.frame.width, self.frame.height) * 0.5
         self.engine = SimpleCircleLiquidEngine(radiusThresh: radius * 0.73, angleThresh: 0.45)
         engine?.viscosity = viscosity
-//        self.bigEngine = SimpleCircleLiquidEngine(radiusThresh: radius, angleThresh: 0.55)
-//        bigEngine?.viscosity = viscosity
+        self.bigEngine = SimpleCircleLiquidEngine(radiusThresh: radius, angleThresh: 0.55)
+        bigEngine?.viscosity = viscosity
         self.engine?.color = actionButton.color
         self.bigEngine?.color = actionButton.color
 
@@ -320,13 +317,11 @@ class CircleLiquidBaseView : ActionBarBaseView {
     func open(_ cells: [LiquidFloatingCell]) {
         stop()
         displayLink = CADisplayLink(target: self, selector: #selector(CircleLiquidBaseView.didDisplayRefresh(_:)))
-		displayLink?.add(to: RunLoop.current, forMode: RunLoop.Mode.common)
+        displayLink?.add(to: RunLoop.current, forMode: RunLoopMode.commonModes)
         opening = true
         for cell in cells {
             cell.layer.removeAllAnimations()
-			if enableShadow {
-            	cell.layer.eraseShadow()
-			}
+            cell.layer.eraseShadow()
             openingCells.append(cell)
         }
     }
@@ -335,12 +330,10 @@ class CircleLiquidBaseView : ActionBarBaseView {
         stop()
         opening = false
         displayLink = CADisplayLink(target: self, selector: #selector(CircleLiquidBaseView.didDisplayRefresh(_:)))
-		displayLink?.add(to: RunLoop.current, forMode: RunLoop.Mode.common)
+        displayLink?.add(to: RunLoop.current, forMode: RunLoopMode.commonModes)
         for cell in cells {
             cell.layer.removeAllAnimations()
-			if enableShadow {
-            	cell.layer.eraseShadow()
-			}
+            cell.layer.eraseShadow()
             openingCells.append(cell)
             cell.isUserInteractionEnabled = false
         }
@@ -445,7 +438,7 @@ class CircleLiquidBaseView : ActionBarBaseView {
         return -1 * t * (t - 2)
     }
     
-	@objc func didDisplayRefresh(_ displayLink: CADisplayLink) {
+    func didDisplayRefresh(_ displayLink: CADisplayLink) {
         if opening {
             keyDuration += CGFloat(displayLink.duration)
             updateOpen()
@@ -497,7 +490,7 @@ open class LiquidFloatingCell : LiquittableCircle {
     }
     
     func setup(_ image: UIImage, tintColor: UIColor = UIColor.white) {
-		imageView.image = image.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
+        imageView.image = image.withRenderingMode(UIImageRenderingMode.alwaysTemplate)
         imageView.tintColor = tintColor
         setupView(imageView)
     }
