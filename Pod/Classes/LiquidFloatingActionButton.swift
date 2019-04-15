@@ -225,10 +225,14 @@ open class LiquidFloatingActionButton : UIView {
         liquidView.frame = baseView.frame
         liquidView.isUserInteractionEnabled = false
         addSubview(liquidView)
-        
+		
         liquidView.layer.addSublayer(circleLayer)
         circleLayer.frame = liquidView.layer.bounds
-        
+		
+		liquidView.layer.allowsEdgeAntialiasing = true
+		circleLayer.allowsEdgeAntialiasing = true
+		plusLayer.allowsEdgeAntialiasing = true
+		
         plusLayer = createPlusLayer(circleLayer.bounds)
         circleLayer.addSublayer(plusLayer)
 		plusLayer.frame = CGRect(x: circleLayer.bounds.width * internalRadiusRatio,
