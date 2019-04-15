@@ -66,6 +66,7 @@ open class LiquidFloatingActionButton : UIView {
     @IBInspectable open var image: UIImage? {
         didSet {
             if image != nil {
+				plusLayer.minificationFilter = CALayerContentsFilter.trilinear // Avoid anti aliasing
                 plusLayer.contents = image!.cgImage
                 plusLayer.path = nil
             }
