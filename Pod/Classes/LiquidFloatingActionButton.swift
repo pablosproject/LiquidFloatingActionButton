@@ -33,7 +33,7 @@ public enum LiquidFloatingActionButtonAnimateStyle : Int {
 @IBDesignable
 open class LiquidFloatingActionButton : UIView {
 
-    fileprivate let internalRadiusRatio: CGFloat = 20.0 / 56.0
+    fileprivate let internalRadiusRatio: CGFloat = 0.22
     open var cellRadiusRatio: CGFloat      = 0.38
     open var animateStyle: LiquidFloatingActionButtonAnimateStyle = .up {
         didSet {
@@ -230,7 +230,10 @@ open class LiquidFloatingActionButton : UIView {
         
         plusLayer = createPlusLayer(circleLayer.bounds)
         circleLayer.addSublayer(plusLayer)
-        plusLayer.frame = circleLayer.bounds
+		plusLayer.frame = CGRect(x: circleLayer.bounds.width * internalRadiusRatio,
+								 y: circleLayer.bounds.height * internalRadiusRatio,
+								 width: circleLayer.bounds.width * (1 - internalRadiusRatio * 2),
+								 height: circleLayer.bounds.height * (1 - internalRadiusRatio * 2))
     }
 
     fileprivate func didTapped() {
